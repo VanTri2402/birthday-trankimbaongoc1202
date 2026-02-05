@@ -1,0 +1,1146 @@
+<!doctype html>
+<html lang="vi">
+  <head>
+    <meta charset="UTF-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"
+    />
+    <title>Trần Kim Bảo Ngọc - The Eternal Muse</title>
+
+    <!-- FONTS -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Alex+Brush&family=Cinzel:wght@400;600;700&family=Montserrat:wght@300;400;500;600&family=Pinyon+Script&family=Playfair+Display:ital,wght@0,400;0,600;1,400&family=Cormorant+Garamond:ital,wght@0,400;0,600;1,600&display=swap"
+      rel="stylesheet"
+    />
+
+    <!-- LIBRARIES -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+
+    <style>
+      :root {
+        /* PALETTE */
+        --bg-deep: #2d1b26;
+        --bg-paper: #fffcf5;
+        --primary-pink: #ffc2d1;
+        --deep-rose: #b76e79;
+        --hot-pink: #e84393;
+        --gold: #d4af37;
+        --text-light: #fff5f8;
+        --text-dark: #5e4b52;
+      }
+
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+
+      body {
+        background-color: var(--bg-deep);
+        color: var(--text-light);
+        font-family: "Montserrat", sans-serif;
+        overflow-x: hidden;
+        user-select: none;
+        -webkit-user-select: none;
+      }
+
+      /* --- CINEMATIC GRAIN --- */
+      body::after {
+        content: "";
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)' opacity='0.04'/%3E%3C/svg%3E");
+        pointer-events: none;
+        z-index: 9990;
+        mix-blend-mode: overlay;
+      }
+
+      /* TYPOGRAPHY */
+      .serif {
+        font-family: "Playfair Display", serif;
+      }
+      .cinzel {
+        font-family: "Cinzel", serif;
+        letter-spacing: 2px;
+      }
+      .royal {
+        font-family: "Pinyon Script", cursive;
+      }
+      .script {
+        font-family: "Alex Brush", cursive;
+      }
+      .reading {
+        font-family: "Cormorant Garamond", serif;
+      }
+
+      .hidden {
+        opacity: 0;
+        pointer-events: none;
+      }
+      canvas {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        pointer-events: none;
+        z-index: 1;
+      }
+
+      /* GLOBAL PARTICLES */
+      #global-particles {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        pointer-events: none;
+        z-index: 9980;
+      }
+
+      .text-safe {
+        width: 90%;
+        max-width: 600px;
+        text-align: center;
+        position: relative;
+        z-index: 10;
+        padding: 0 15px;
+        word-wrap: break-word;
+      }
+
+      /* --- LOADER --- */
+      #loader {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100vh;
+        background: radial-gradient(circle at center, #5e2a40 0%, #1a0b10 100%);
+        z-index: 9999;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        transition: opacity 1.5s ease-in-out;
+      }
+      .loader-ring {
+        width: 80px;
+        height: 80px;
+        border: 3px solid transparent;
+        border-top-color: var(--primary-pink);
+        border-radius: 50%;
+        animation: spin 1s linear infinite;
+        box-shadow: 0 0 20px rgba(255, 183, 197, 0.3);
+      }
+      .start-btn {
+        margin-top: 30px;
+        padding: 15px 40px;
+        background: linear-gradient(45deg, #d4af37, #f1c40f);
+        color: #fff;
+        border: none;
+        border-radius: 2px;
+        font-family: "Cinzel", serif;
+        font-weight: 700;
+        font-size: 0.9rem;
+        cursor: pointer;
+        transition: 0.5s;
+        letter-spacing: 4px;
+        box-shadow: 0 5px 20px rgba(212, 175, 55, 0.4);
+      }
+      .start-btn:active {
+        transform: scale(0.95);
+      }
+
+      /* --- SECTIONS --- */
+      .section {
+        position: relative;
+        width: 100%;
+        min-height: 100vh;
+        overflow: hidden;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        padding: 40px 0;
+      }
+
+      /* PARTICLES */
+      .love-dust {
+        position: absolute;
+        background: radial-gradient(circle, #fff, transparent);
+        border-radius: 50%;
+        opacity: 0.8;
+        pointer-events: none;
+        animation: floatDust linear infinite;
+        filter: drop-shadow(0 0 5px #fff);
+      }
+      .heart-dust {
+        position: absolute;
+        color: var(--primary-pink);
+        font-size: 12px;
+        opacity: 0.6;
+        pointer-events: none;
+        animation: floatDust linear infinite;
+        text-shadow: 0 0 8px var(--hot-pink);
+      }
+
+      /* CHAP 1: NÀNG THƠ */
+      #chap-muse {
+        background: linear-gradient(180deg, #fff5f8 0%, #ffe6ea 100%);
+        color: var(--text-dark);
+      }
+      .muse-frame {
+        position: absolute;
+        padding: 12px;
+        background: #fff;
+        box-shadow: 0 20px 50px rgba(183, 110, 121, 0.2);
+        opacity: 0;
+        border-radius: 4px;
+      }
+      .p1 {
+        width: 70%;
+        top: 10%;
+        left: 0%;
+        z-index: 2;
+        transform: rotate(-5deg);
+      }
+      .p2 {
+        width: 60%;
+        bottom: 10%;
+        right: 0%;
+        z-index: 3;
+        transform: rotate(5deg);
+      }
+      .p3 {
+        width: 50%;
+        top: 40%;
+        left: 25%;
+        z-index: 1;
+        filter: blur(1px) contrast(1.1);
+        opacity: 0.8;
+      }
+      .muse-img {
+        width: 100%;
+        display: block;
+        border: 1px solid #eee;
+      }
+
+      .title-box {
+        background: rgba(255, 255, 255, 0.6);
+        backdrop-filter: blur(20px);
+        border: 1px solid rgba(255, 255, 255, 0.8);
+        padding: 30px 20px;
+        border-radius: 50% 50% 0 0 / 20px 20px 0 0;
+        box-shadow: 0 20px 60px rgba(232, 67, 147, 0.15);
+        z-index: 10;
+        margin-bottom: 20px;
+        text-align: center;
+      }
+      .title-box h1 {
+        font-size: 3.5rem;
+        color: var(--deep-rose);
+        margin: 0;
+        line-height: 0.9;
+      }
+      .title-box p {
+        font-size: 0.8rem;
+        color: #8e5a5a;
+        margin-top: 15px;
+        letter-spacing: 5px;
+        font-weight: 600;
+        text-transform: uppercase;
+      }
+
+      /* CHAP 2: ZEN */
+      #chap-zen {
+        background: radial-gradient(circle at center, #6d214f, #2d1b26);
+        color: #fff;
+      }
+      .zen-gateway {
+        position: relative;
+        width: 280px;
+        height: 420px;
+        border: 1px solid rgba(255, 255, 255, 0.4);
+        border-radius: 200px 200px 0 0;
+        overflow: hidden;
+        z-index: 5;
+        box-shadow: 0 0 100px rgba(255, 183, 197, 0.3);
+        opacity: 0;
+        background: #000;
+      }
+      .zen-photo {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        opacity: 0.95;
+      }
+      .zen-overlay {
+        position: absolute;
+        bottom: 0;
+        width: 100%;
+        background: linear-gradient(to top, #2d1b26 20%, transparent);
+        padding: 80px 20px 40px;
+        text-align: center;
+      }
+      .zen-bg-layer {
+        position: absolute;
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        opacity: 0.1;
+        filter: grayscale(100%) hue-rotate(290deg);
+        z-index: 0;
+        transform: scale(1.1);
+      }
+
+      /* CHAP 3: DESTINY */
+      #chap-destiny {
+        background:
+          radial-gradient(
+            circle at 20% 30%,
+            rgba(232, 67, 147, 0.4),
+            transparent 50%
+          ),
+          radial-gradient(
+            circle at 80% 70%,
+            rgba(109, 33, 79, 0.6),
+            transparent 50%
+          ),
+          #1a0b10;
+      }
+      .heart-core {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        width: 300px;
+        height: 300px;
+        background: radial-gradient(
+          circle,
+          rgba(255, 194, 209, 0.3) 0%,
+          transparent 70%
+        );
+        animation: heartbeat 2s infinite;
+        z-index: 0;
+        border-radius: 50%;
+        filter: blur(20px);
+      }
+      .thread-text h2 {
+        font-family: "Pinyon Script", cursive;
+        color: var(--primary-pink);
+        text-shadow: 0 0 30px var(--hot-pink);
+        font-size: 3.5rem;
+        margin-bottom: 10px;
+      }
+      .cinzel-big {
+        font-size: 5rem;
+        color: #fff;
+        text-shadow: 0 0 30px var(--hot-pink);
+        line-height: 1;
+        font-weight: 700;
+      }
+      .destiny-quote {
+        font-family: "Cormorant Garamond", serif;
+        font-size: 1.4rem;
+        color: #ffeef2;
+        font-style: italic;
+        margin-top: 30px;
+        line-height: 1.6;
+        text-shadow: 0 2px 10px rgba(0, 0, 0, 0.8);
+        max-width: 85%;
+        margin-left: auto;
+        margin-right: auto;
+      }
+
+      /* CHAP 4: LETTER */
+      #chap-letter {
+        background:
+          url("https://www.transparenttextures.com/patterns/stardust.png"),
+          linear-gradient(to bottom, #4a2c40, #2d1b26);
+      }
+      .scroll-paper {
+        background: rgba(255, 255, 255, 0.05); /* Glass */
+        backdrop-filter: blur(25px) saturate(150%);
+        width: 90%;
+        max-height: 70vh;
+        overflow-y: auto;
+        padding: 40px 30px;
+        border-radius: 10px;
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        border-top: 1px solid rgba(255, 255, 255, 0.5);
+        box-shadow: 0 20px 80px rgba(0, 0, 0, 0.6);
+
+        font-family: "Pinyon Script", cursive;
+        font-size: 1.8rem;
+        color: #ffc2d1;
+        line-height: 1.6;
+        text-shadow: 0 2px 5px rgba(0, 0, 0, 0.5);
+      }
+      .scroll-paper::-webkit-scrollbar {
+        width: 3px;
+      }
+      .scroll-paper::-webkit-scrollbar-thumb {
+        background: var(--gold);
+      }
+
+      /* CHAP 5: PRAYER (FIXED RESPONSIVENESS) */
+      #chap-prayer {
+        background: radial-gradient(circle, #b33771 0%, #2c1b2e 100%);
+      }
+      .hold-area {
+        position: relative;
+        width: 80vw;
+        max-width: 300px;
+        height: 105vw;
+        max-height: 400px;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+      }
+      .prayer-frame {
+        width: 100%;
+        height: 100%;
+        border-radius: 50% 50% 10% 10% / 40% 40% 5% 5%; /* Hình vòm responsive */
+        overflow: hidden;
+        border: 3px solid rgba(255, 255, 255, 0.3);
+        position: relative;
+        z-index: 5;
+        transition: all 0.3s ease;
+        cursor: pointer;
+        box-shadow: 0 0 40px rgba(251, 197, 49, 0.3);
+      }
+      .prayer-photo {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        filter: sepia(0.3) contrast(1.1);
+        transition: 0.5s;
+      }
+
+      .energy-ring {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        width: 110%;
+        height: 110%; /* Lớn hơn khung một chút */
+        border-radius: 50% 50% 10% 10% / 40% 40% 5% 5%;
+        border: 2px solid var(--gold);
+        opacity: 0;
+        transition: 0.2s;
+        box-shadow: 0 0 30px var(--gold);
+        z-index: 1;
+      }
+
+      .hold-hint {
+        position: absolute;
+        bottom: -50px;
+        width: 100%;
+        text-align: center;
+        color: var(--gold);
+        font-size: 0.9rem;
+        letter-spacing: 3px;
+        animation: blink 2s infinite;
+        text-transform: uppercase;
+        text-shadow: 0 0 10px rgba(251, 197, 49, 0.5);
+      }
+      .prayer-content {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        z-index: 20;
+        opacity: 0;
+        pointer-events: none;
+        background: rgba(44, 27, 46, 0.9);
+        padding: 25px;
+        text-align: center;
+      }
+      .prayer-verse {
+        font-family: "Pinyon Script", cursive;
+        font-size: 1.8rem;
+        color: #fff;
+        line-height: 1.4;
+        text-shadow: 0 0 10px var(--gold);
+      }
+
+      /* --- CHAP 6: THE VOW (FIXED UI BUG) --- */
+      #chap-contract {
+        background: linear-gradient(to top, #1a0b14, #2c1b2e);
+        border-top: 3px solid var(--hot-pink);
+      }
+      .vow-certificate {
+        width: 90%;
+        max-width: 500px;
+        background: var(--bg-paper);
+        border: 2px solid var(--gold);
+        outline: 4px double var(--gold);
+        outline-offset: 5px;
+        padding: 30px 20px 50px 20px; /* Thêm padding dưới để chứa con dấu */
+        border-radius: 4px;
+        position: relative;
+        color: #4a2c2c;
+        box-shadow: 0 0 100px rgba(255, 215, 0, 0.2);
+        text-align: center;
+        background-image: radial-gradient(#d4af37 0.5px, transparent 0.5px);
+        background-size: 15px 15px;
+      }
+      /* Họa tiết góc */
+      .vow-certificate::before,
+      .vow-certificate::after {
+        content: "✦";
+        position: absolute;
+        color: var(--gold);
+        font-size: 1.5rem;
+      }
+      .vow-certificate::before {
+        top: 10px;
+        left: 10px;
+      }
+      .vow-certificate::after {
+        bottom: 10px;
+        right: 10px;
+      }
+
+      .vow-header {
+        font-family: "Cinzel", serif;
+        font-size: 1.6rem;
+        color: #d4af37;
+        margin-bottom: 15px;
+        font-weight: 700;
+        text-shadow: 1px 1px 0px #fff;
+        border-bottom: 1px solid #d4af37;
+        padding-bottom: 10px;
+        display: inline-block;
+      }
+      .vow-names {
+        font-family: "Pinyon Script", cursive;
+        font-size: 2.5rem;
+        color: #b76e79;
+        margin: 15px 0;
+        line-height: 1.2;
+      }
+      .vow-body {
+        font-family: "Montserrat", sans-serif;
+        font-size: 0.85rem;
+        line-height: 1.7;
+        margin-bottom: 20px;
+        font-weight: 500;
+      }
+      .wedding-rings {
+        font-size: 2.5rem;
+        margin: 10px 0;
+        color: #d4af37;
+        animation: pulse 3s infinite;
+      }
+
+      #signature-pad {
+        width: 100%;
+        height: 100px;
+        margin: 0 auto;
+        border-bottom: 2px solid #4a2c2c;
+        background: transparent;
+        touch-action: none;
+      }
+      .sign-placeholder {
+        font-size: 0.7rem;
+        color: #888;
+        margin-bottom: 5px;
+        text-transform: uppercase;
+        letter-spacing: 2px;
+      }
+      .sign-btn {
+        margin-top: 15px;
+        padding: 12px 35px;
+        background: linear-gradient(to right, #d4af37, #f1c40f);
+        color: #fff;
+        border: none;
+        font-family: "Cinzel", serif;
+        font-weight: bold;
+        cursor: pointer;
+        text-transform: uppercase;
+        letter-spacing: 2px;
+        box-shadow: 0 5px 15px rgba(212, 175, 55, 0.4);
+        border-radius: 50px;
+      }
+
+      /* FIX BUG: Con dấu nằm gọn góc phải dưới, không đè chữ */
+      .wax-seal {
+        position: absolute;
+        bottom: 20px;
+        right: 20px;
+        width: 90px;
+        height: 90px;
+        background: radial-gradient(circle at 30% 30%, #ff4d4d, #990000);
+        border-radius: 50%;
+        box-shadow:
+          3px 3px 10px rgba(0, 0, 0, 0.4),
+          inset 0 0 20px rgba(0, 0, 0, 0.2);
+        border: 2px dashed rgba(255, 255, 255, 0.4);
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        color: rgba(255, 255, 255, 0.9);
+        font-weight: bold;
+        font-family: "Cinzel", serif;
+        font-size: 0.9rem;
+        opacity: 0;
+        transform: scale(1.5) rotate(-15deg);
+        pointer-events: none;
+        z-index: 20;
+        text-shadow: 0 1px 2px #000;
+      }
+
+      /* ANIMATIONS */
+      @keyframes heartbeat {
+        0% {
+          transform: translate(-50%, -50%) scale(1);
+          opacity: 0.5;
+        }
+        50% {
+          transform: translate(-50%, -50%) scale(1.2);
+          opacity: 0.8;
+        }
+        100% {
+          transform: translate(-50%, -50%) scale(1);
+          opacity: 0.5;
+        }
+      }
+      @keyframes floatDust {
+        0% {
+          transform: translateY(0) translateX(0) rotate(0deg);
+          opacity: 0;
+        }
+        50% {
+          opacity: 1;
+        }
+        100% {
+          transform: translateY(-100vh) translateX(50px) rotate(360deg);
+          opacity: 0;
+        }
+      }
+      @keyframes spin {
+        0% {
+          transform: rotate(0deg);
+        }
+        100% {
+          transform: rotate(360deg);
+        }
+      }
+      @keyframes blink {
+        0%,
+        100% {
+          opacity: 0.5;
+        }
+        50% {
+          opacity: 1;
+        }
+      }
+      @keyframes pulse {
+        0% {
+          opacity: 0.7;
+          transform: scale(0.95);
+        }
+        50% {
+          opacity: 1;
+          transform: scale(1.05);
+        }
+        100% {
+          opacity: 0.7;
+          transform: scale(0.95);
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <!-- AUDIO PLAYER -->
+    <div id="yt-player" data-video-id="3onAOL9dY1o"></div>
+
+    <!-- GLOBAL PARTICLES (FIXED & FULL SCREEN) -->
+    <div id="global-particles"></div>
+
+    <!-- 0. LOADER -->
+    <div id="loader">
+      <div class="loader-ring"></div>
+      <div
+        class="serif"
+        style="
+          color: var(--primary-pink);
+          margin-top: 20px;
+          font-size: 1.8rem;
+          text-shadow: 0 0 20px var(--hot-pink);
+        "
+      >
+        Trần Kim Bảo Ngọc
+      </div>
+      <div
+        class="cinzel"
+        style="
+          color: var(--gold);
+          font-size: 0.8rem;
+          margin-top: 10px;
+          letter-spacing: 5px;
+        "
+      >
+        THE ETERNAL MUSE
+      </div>
+      <button class="start-btn" onclick="enterUniverse()">KẾT NỐI</button>
+    </div>
+
+    <!-- MAIN APP -->
+    <div id="main-app" class="hidden">
+      <!-- 1. NÀNG THƠ -->
+      <div class="section" id="chap-muse">
+        <canvas id="canvas-petals"></canvas>
+        <div class="text-safe title-box">
+          <h1 class="serif">Tuổi 18</h1>
+          <p class="cinzel" style="color: #a45056; font-size: 0.8rem">
+            NGỌT NGÀO NHƯ ÁNH DƯƠNG
+          </p>
+        </div>
+        <div class="muse-frame p1">
+          <img
+            src=assets/z7505800560704_28f8f1a9ad403aab96492601257acf32.jpg
+            class="muse-img"
+          />
+        </div>
+        <div class="muse-frame p2">
+          <img
+            src=assets/z7505800559378_879107eb21e0e155380a06b7829f59af.jpg
+            class="muse-img"
+          />
+        </div>
+        <div class="muse-frame p3">
+          <img
+            src=assets/z7505800560882_47b88f285e91e5263a0466b5c4140585.jpg
+            class="muse-img"
+          />
+        </div>
+      </div>
+
+      <!-- 2. CÕI TỊNH -->
+      <div class="section" id="chap-zen">
+        <div class="zen-gateway">
+          <img
+            src=assets/z7505800568275_c58c5ba702d7f29b6aa8afe8627e1fba.jpg
+            class="zen-photo"
+          />
+          <div class="zen-overlay">
+            <h2
+              class="royal"
+              style="
+                font-size: 3.5rem;
+                color: #e0ccff;
+                text-shadow: 0 0 20px #8854d0;
+              "
+            >
+              An Yên
+            </h2>
+            <p
+              class="reading"
+              style="font-size: 1.3rem; color: #f3e5f5; margin-top: 10px"
+            >
+              "Vẻ đẹp sâu sắc nhất của em nằm ở tâm hồn hướng thiện."
+            </p>
+          </div>
+        </div>
+        <img
+          src=assets/z7505800561206_f3b5530a7faaa0897d7b0d421ad0a398.jpg
+          class="zen-bg-layer"
+        />
+      </div>
+
+      <!-- 3. ĐỊNH MỆNH -->
+      <div class="section" id="chap-destiny">
+        <canvas id="canvas-thread"></canvas>
+        <div class="heart-core"></div>
+
+        <div class="thread-text text-safe">
+          <h2 class="royal" style="font-size: 4rem; margin: 0; color: #ffb7c5">
+            Giao Thoa
+          </h2>
+          <p
+            class="cinzel"
+            style="font-size: 0.9rem; color: var(--gold); margin-bottom: 20px"
+          >
+            CỦA HAI LINH HỒN
+          </p>
+          <h1 class="cinzel-big">26/1</h1>
+          <p class="destiny-quote">
+            "Trong khoảnh khắc thiêng liêng ấy, vũ trụ đã ngừng quay để chứng
+            giám cho lời thề thầm lặng:<br />
+            <span style="color: var(--primary-pink); font-weight: 700"
+              >Em đã thuộc về Anh, trọn vẹn và duy nhất.</span
+            >"
+          </p>
+        </div>
+      </div>
+
+      <!-- 4. BỨC THƯ -->
+      <div class="section" id="chap-letter">
+        <div class="scroll-paper text-safe" id="letter-content"></div>
+      </div>
+
+      <!-- 5. LỜI NGUYỆN CẦU (FIXED FRAME) -->
+      <div class="section" id="chap-prayer">
+        <div class="hold-area" id="hold-target">
+          <div class="energy-ring"></div>
+          <div class="prayer-frame">
+            <img
+              src=assets/z7505800560882_47b88f285e91e5263a0466b5c4140585.jpg
+              class="prayer-photo"
+              id="prayer-img"
+            />
+            <div class="prayer-content" id="prayer-text">
+              <div
+                style="
+                  font-family: &quot;Cinzel&quot;, serif;
+                  color: var(--gold);
+                  font-size: 1.2rem;
+                  margin-bottom: 20px;
+                "
+              >
+                TÂM NGUYỆN
+              </div>
+              <p class="prayer-verse">
+                "Nguyện dùng cả sinh mệnh này<br />
+                để che chở cho nụ cười của em<br />
+                một đời bình an."
+              </p>
+            </div>
+          </div>
+          <div class="hold-hint" id="hold-hint">GIỮ CHẶT ĐỂ CẦU NGUYỆN</div>
+        </div>
+      </div>
+
+      <!-- 6. HÔN ƯỚC NGÂN HÀ (FIXED SEAL POSITION) -->
+      <div class="section" id="chap-contract">
+        <div class="vow-certificate">
+          <div class="vow-header">Hôn Ước Ngân Hà</div>
+          <div class="wedding-rings">💍</div>
+          <div class="vow-body">
+            Trước sự chứng giám của các vì sao và đất trời,<br />
+            Văn Trí xin thề nguyện sẽ dùng cả cuộc đời này<br />
+            để yêu thương, bảo vệ và xây dựng một tương lai rực rỡ nhất<br />
+            cho người vợ định mệnh của mình:
+          </div>
+
+          <div class="vow-names">Trần Kim Bảo Ngọc</div>
+
+          <div class="sign-placeholder">CHỮ KÝ CỦA EM</div>
+          <canvas id="signature-pad"></canvas>
+
+          <button class="sign-btn" onclick="submitSign()">
+            ĐỒNG Ý LẤY ANH
+          </button>
+
+          <!-- Con dấu sáp đỏ: Đặt ở góc dưới cùng bên phải, không che chữ ký -->
+          <div class="wax-seal" id="seal">ĐÃ KÝ</div>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      // --- AUTO-PLAY MUSIC ---
+      var player;
+      function onYouTubeIframeAPIReady() {
+        player = new YT.Player("yt-player", {
+          height: "0",
+          width: "0",
+          videoId: "3onAOL9dY1o",
+          playerVars: {
+            autoplay: 0,
+            controls: 0,
+            loop: 1,
+            playlist: "3onAOL9dY1o",
+          },
+          events: { onReady: onPlayerReady },
+        });
+      }
+      function onPlayerReady(event) {
+        event.target.setVolume(100);
+      }
+      var tag = document.createElement("script");
+      tag.src = "https://www.youtube.com/iframe_api";
+      var firstScriptTag = document.getElementsByTagName("script")[0];
+      firstScriptTag.parentNode.insertBefore(tag, firstScriptTag);
+
+      function enterUniverse() {
+        if (player && player.playVideo) {
+          player.playVideo();
+          player.unMute();
+        }
+        gsap.to("#loader", {
+          opacity: 0,
+          duration: 1.5,
+          onComplete: () => {
+            document.getElementById("loader").style.display = "none";
+            document.getElementById("main-app").classList.remove("hidden");
+            initAnims();
+            initThread();
+            initHold();
+          },
+        });
+      }
+
+      // --- PARTICLES ---
+      function addFullLoveDust() {
+        const container = document.getElementById("global-particles");
+        const particleCount = 60;
+        for (let i = 0; i < particleCount; i++) {
+          let d = document.createElement("div");
+          d.className = "love-dust";
+          d.style.left = Math.random() * 100 + "vw";
+          d.style.top = Math.random() * 100 + "vh";
+          d.style.width = Math.random() * 3 + 1 + "px";
+          d.style.height = d.style.width;
+          d.style.animationDuration = Math.random() * 10 + 10 + "s";
+          d.style.animationDelay = Math.random() * 5 + "s";
+          container.appendChild(d);
+
+          if (i % 3 === 0) {
+            let h = document.createElement("div");
+            h.className = "heart-dust";
+            h.innerHTML = "❤";
+            h.style.left = Math.random() * 100 + "vw";
+            h.style.top = Math.random() * 100 + "vh";
+            h.style.fontSize = Math.random() * 12 + 8 + "px";
+            h.style.animationDuration = Math.random() * 15 + 10 + "s";
+            h.style.animationDelay = Math.random() * 5 + "s";
+            container.appendChild(h);
+          }
+        }
+      }
+      addFullLoveDust();
+
+      gsap.registerPlugin(ScrollTrigger);
+
+      function initAnims() {
+        gsap.to(".p1", {
+          y: -30,
+          opacity: 1,
+          duration: 1.5,
+          scrollTrigger: { trigger: "#chap-muse", start: "top center" },
+        });
+        gsap.to(".p2", {
+          y: -20,
+          opacity: 1,
+          duration: 1.5,
+          delay: 0.2,
+          scrollTrigger: { trigger: "#chap-muse", start: "top center" },
+        });
+        gsap.to(".p3", {
+          scale: 1.1,
+          opacity: 0.8,
+          duration: 2,
+          scrollTrigger: { trigger: "#chap-muse", start: "top center" },
+        });
+        gsap.to(".zen-gateway", {
+          opacity: 1,
+          y: -20,
+          duration: 2,
+          scrollTrigger: { trigger: "#chap-zen", start: "top center" },
+        });
+        ScrollTrigger.create({
+          trigger: "#chap-letter",
+          start: "top center",
+          onEnter: typeWriter,
+        });
+      }
+
+      // --- CANVAS: PETALS ---
+      function initPetals() {
+        const c = document.getElementById("canvas-petals");
+        if (!c) return;
+        const ctx = c.getContext("2d");
+        c.width = window.innerWidth;
+        c.height = window.innerHeight;
+        // ... (Code cánh hoa giữ nguyên hoặc thêm nếu cần)
+      }
+
+      // --- THREAD ---
+      function initThread() {
+        const c = document.getElementById("canvas-thread");
+        const ctx = c.getContext("2d");
+        c.width = window.innerWidth;
+        c.height = window.innerHeight;
+        let stars = Array.from({ length: 60 }, () => ({
+          x: Math.random() * c.width,
+          y: Math.random() * c.height,
+          s: Math.random() * 2,
+          a: Math.random(),
+        }));
+        function anim() {
+          ctx.clearRect(0, 0, c.width, c.height);
+          stars.forEach((s) => {
+            ctx.fillStyle = `rgba(255,192,203,${s.a})`;
+            ctx.beginPath();
+            ctx.arc(s.x, s.y, s.s, 0, 6.28);
+            ctx.fill();
+            s.a = 0.5 + Math.sin(Date.now() * 0.001 + s.x) * 0.5;
+          });
+          ctx.strokeStyle = "rgba(255, 46, 99, 0.4)";
+          ctx.lineWidth = 1;
+          ctx.beginPath();
+          ctx.moveTo(0, c.height / 2);
+          ctx.bezierCurveTo(
+            c.width / 3,
+            c.height / 3,
+            (c.width * 2) / 3,
+            (c.height * 2) / 3,
+            c.width,
+            c.height / 2,
+          );
+          ctx.stroke();
+          requestAnimationFrame(anim);
+        }
+        anim();
+      }
+
+      // --- TYPEWRITER ---
+      const txt = `Gửi Kim Ngọc - Nàng thơ vĩnh cửu của anh,<br><br>
+        Người ta nói vũ trụ bao la vô tận, nhưng anh không tin vào sự vô tận đó cho đến khi lạc vào ánh mắt em.<br><br>
+        Ngày 10/1 là khởi đầu của định mệnh, nhưng ngày 26/1 mới là khoảnh khắc linh hồn anh thực sự tìm thấy bến đỗ. Giữa muôn vàn tinh tú, em là ngôi sao sáng nhất, ấm áp nhất soi rọi cuộc đời anh.<br><br>
+        Cảm ơn em - một Trần Kim Bảo Ngọc với trái tim thiện lương và bao dung - đã dũng cảm nắm lấy tay anh khi anh chưa có gì trong tay ngoài một tấm chân tình.<br><br>
+        Anh không hứa sẽ cho em cả thế giới ngay lập tức, nhưng anh thề sẽ dùng từng giây phút của cuộc đời này để kiến tạo một thế giới mà ở đó, em là Nữ Hoàng hạnh phúc nhất.<br><br>
+        Tuổi 18 rực rỡ và bình an nhé, Vợ yêu của anh!<br><b>Văn Trí.</b>`;
+      let isTyped = false;
+      function typeWriter() {
+        if (isTyped) return;
+        isTyped = true;
+        document.getElementById("letter-content").innerHTML = txt;
+        gsap.from("#letter-content", { opacity: 0, y: 20, duration: 2 });
+      }
+
+      // --- HOLD TO PRAY ---
+      function initHold() {
+        const target = document.getElementById("hold-target");
+        const frame = document.querySelector(".prayer-frame");
+        const img = document.getElementById("prayer-img");
+        const content = document.getElementById("prayer-text");
+        const hint = document.getElementById("hold-hint");
+        const ring = document.querySelector(".energy-ring");
+        let timer = null;
+        let progress = 0;
+
+        function start(e) {
+          e.preventDefault();
+          frame.style.transform = "scale(0.95)";
+          ring.style.opacity = 1;
+          timer = setInterval(() => {
+            progress += 2;
+            img.style.filter = `sepia(${0.2 + (progress / 100) * 0.8})`;
+            frame.style.boxShadow = `0 0 ${progress / 2}px rgba(251, 197, 49, 0.6)`;
+            if (progress >= 100) finish();
+          }, 30);
+        }
+        function end() {
+          clearInterval(timer);
+          if (progress < 100) {
+            progress = 0;
+            frame.style.transform = "scale(1)";
+            img.style.filter = "sepia(0.2)";
+            ring.style.opacity = 0;
+          }
+        }
+        function finish() {
+          clearInterval(timer);
+          confetti({
+            particleCount: 200,
+            spread: 100,
+            origin: { y: 0.6 },
+            colors: ["#fbc531", "#e84393"],
+          });
+          gsap.to(img, { filter: "brightness(0.3) blur(2px)", duration: 1 });
+          gsap.to(hint, { opacity: 0 });
+          gsap.to(ring, { scale: 1.5, opacity: 0, duration: 0.5 });
+          gsap.to(content, {
+            opacity: 1,
+            scale: 1,
+            duration: 1.5,
+            ease: "power2.out",
+          });
+          target.removeEventListener("mousedown", start);
+          target.removeEventListener("touchstart", start);
+        }
+        target.addEventListener("mousedown", start);
+        target.addEventListener("mouseup", end);
+        target.addEventListener("touchstart", start);
+        target.addEventListener("touchend", end);
+      }
+
+      // --- SIGNATURE ---
+      const cvs = document.getElementById("signature-pad");
+      const cx = cvs.getContext("2d");
+      let draw = false;
+      function resize() {
+        const rect = cvs.getBoundingClientRect();
+        cvs.width = rect.width;
+        cvs.height = rect.height;
+        cx.strokeStyle = "#4a2c2c";
+        cx.lineWidth = 2;
+        cx.lineCap = "round";
+      }
+      setTimeout(resize, 500);
+      function getPos(e) {
+        const rect = cvs.getBoundingClientRect();
+        const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+        const clientY = e.touches ? e.touches[0].clientY : e.clientY;
+        return { x: clientX - rect.left, y: clientY - rect.top };
+      }
+      function dStart(e) {
+        draw = true;
+        const p = getPos(e);
+        cx.beginPath();
+        cx.moveTo(p.x, p.y);
+      }
+      function dMove(e) {
+        if (!draw) return;
+        e.preventDefault();
+        const p = getPos(e);
+        cx.lineTo(p.x, p.y);
+        cx.stroke();
+      }
+      function dEnd() {
+        draw = false;
+      }
+      cvs.addEventListener("mousedown", dStart);
+      cvs.addEventListener("mousemove", dMove);
+      cvs.addEventListener("mouseup", dEnd);
+      cvs.addEventListener("touchstart", dStart, { passive: false });
+      cvs.addEventListener("touchmove", dMove, { passive: false });
+      cvs.addEventListener("touchend", dEnd);
+
+      function submitSign() {
+        const seal = document.getElementById("seal");
+        gsap.to(seal, {
+          opacity: 1,
+          scale: 1,
+          duration: 0.5,
+          ease: "back.out(1.7)",
+        });
+        document.querySelector(".sign-btn").style.display = "none";
+        confetti({
+          particleCount: 400,
+          spread: 180,
+          origin: { y: 0.8 },
+          colors: ["#ffd700", "#ffffff", "#ffb7c5"],
+        });
+        setTimeout(() => alert("Ngọc đã thuộc về Trí. Vĩnh viễn!"), 1000);
+      }
+    </script>
+  </body>
+</html>
