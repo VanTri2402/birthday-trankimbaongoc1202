@@ -40,6 +40,10 @@
         box-sizing: border-box;
       }
 
+      html {
+        scroll-behavior: smooth;
+      }
+
       body {
         background-color: var(--bg-deep);
         color: var(--text-light);
@@ -116,47 +120,147 @@
         word-wrap: break-word;
       }
 
-      /* --- LOADER --- */
+      /* --- GAME LOADER STYLES (NEW) --- */
       #loader {
         position: fixed;
         top: 0;
         left: 0;
         width: 100%;
         height: 100vh;
-        background: radial-gradient(circle at center, #5e2a40 0%, #1a0b10 100%);
+        background: radial-gradient(circle at center, #1a0b10 0%, #000 100%);
         z-index: 9999;
         display: flex;
         flex-direction: column;
         justify-content: center;
         align-items: center;
         transition: opacity 1.5s ease-in-out;
+        overflow: hidden;
       }
-      .loader-ring {
-        width: 80px;
-        height: 80px;
-        border: 3px solid transparent;
-        border-top-color: var(--primary-pink);
+
+      /* Container for the Heart Collector Game */
+      .game-container {
+        position: relative;
+        width: 300px;
+        height: 300px;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+      }
+
+      /* The Central Heart to Fill */
+      .main-heart-path {
+        fill: none;
+        stroke: rgba(255, 255, 255, 0.1);
+        stroke-width: 2;
+      }
+      .main-heart-fill {
+        fill: var(--hot-pink);
+        clip-path: url(#clip-heart);
+        transform: scaleY(0); /* Starts empty */
+        transform-origin: bottom;
+        transition: transform 0.3s ease-out;
+      }
+      .heart-svg {
+        width: 120px;
+        height: 120px;
+        filter: drop-shadow(0 0 10px var(--hot-pink));
+        animation: heartIdle 2s infinite ease-in-out;
+        z-index: 10;
+      }
+
+      /* Floating Memory Shards (Interactable) */
+      .memory-shard {
+        position: absolute;
+        width: 40px;
+        height: 40px;
+        background: radial-gradient(circle, #fff, var(--primary-pink));
         border-radius: 50%;
-        animation: spin 1s linear infinite;
-        box-shadow: 0 0 20px rgba(255, 183, 197, 0.3);
+        box-shadow: 0 0 15px var(--primary-pink);
+        cursor: pointer;
+        opacity: 0; /* Animated in via JS */
+        z-index: 20;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        font-size: 10px;
+        color: #fff;
+        user-select: none;
+        animation: floatShard 4s infinite ease-in-out;
       }
+      .memory-shard::after {
+        content: "❤";
+        font-size: 12px;
+        opacity: 0.8;
+      }
+
+      /* Progress Text */
+      .loader-progress-text {
+        font-family: "Cinzel", serif;
+        font-size: 2rem;
+        color: #fff;
+        margin-top: 20px;
+        text-shadow: 0 0 10px var(--hot-pink);
+        z-index: 10;
+      }
+
+      .loader-hint {
+        font-family: "Montserrat", sans-serif;
+        font-size: 0.8rem;
+        color: #aaa;
+        margin-top: 10px;
+        letter-spacing: 2px;
+        text-transform: uppercase;
+        animation: blink 2s infinite;
+        z-index: 10;
+      }
+
+      /* Start Button (Hidden initially) */
       .start-btn {
         margin-top: 30px;
-        padding: 15px 40px;
-        background: linear-gradient(45deg, #d4af37, #f1c40f);
-        color: #fff;
-        border: none;
-        border-radius: 2px;
+        padding: 15px 50px;
+        background: transparent;
+        border: 1px solid var(--gold);
+        color: var(--gold);
+        border-radius: 50px;
         font-family: "Cinzel", serif;
         font-weight: 700;
-        font-size: 0.9rem;
+        font-size: 1rem;
         cursor: pointer;
         transition: 0.5s;
-        letter-spacing: 4px;
-        box-shadow: 0 5px 20px rgba(212, 175, 55, 0.4);
+        letter-spacing: 3px;
+        position: relative;
+        overflow: hidden;
+        z-index: 30;
+        opacity: 0;
+        transform: translateY(20px);
+        pointer-events: none; /* Disabled until active */
       }
-      .start-btn:active {
-        transform: scale(0.95);
+      .start-btn.active {
+        opacity: 1;
+        transform: translateY(0);
+        pointer-events: auto;
+        background: var(--gold);
+        color: #000;
+        box-shadow: 0 0 30px rgba(212, 175, 55, 0.8);
+      }
+
+      @keyframes heartIdle {
+        0%,
+        100% {
+          transform: scale(1);
+        }
+        50% {
+          transform: scale(1.05);
+        }
+      }
+      @keyframes floatShard {
+        0%,
+        100% {
+          transform: translateY(0);
+        }
+        50% {
+          transform: translateY(-10px);
+        }
       }
 
       /* --- SECTIONS --- */
@@ -261,6 +365,97 @@
 
       /* CHAP 2: ZEN */
       #chap-zen {
+        background: #fff0f5;
+        transition: background 0.5s ease;
+      }
+      .s2-bg-layer {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: radial-gradient(
+          circle,
+          rgba(255, 255, 255, 0.8) 0%,
+          transparent 100%
+        );
+        z-index: 0;
+        opacity: 0.5;
+      }
+      .s2-card-container {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        gap: 20px;
+        z-index: 10;
+        width: 100%;
+        perspective: 1000px;
+      }
+      .s2-card {
+        width: 42vw;
+        height: 60vw;
+        max-width: 200px;
+        max-height: 300px;
+        cursor: pointer;
+        position: relative;
+        transform-style: preserve-3d;
+        transition: transform 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+      }
+      .s2-card.left {
+        transform: rotateY(15deg) translateZ(0);
+      }
+      .s2-card.right {
+        transform: rotateY(-15deg) translateZ(0);
+      }
+      .s2-card.active {
+        transform: rotateY(0) scale(1.1) translateZ(50px) !important;
+        z-index: 20;
+      }
+      .s2-card.inactive {
+        transform: scale(0.9);
+        opacity: 0.6;
+        filter: blur(2px);
+      }
+      .s2-inner {
+        width: 100%;
+        height: 100%;
+        border-radius: 15px;
+        overflow: hidden;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+        border: 4px solid #fff;
+        position: relative;
+      }
+      .s2-img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        transition: transform 0.5s;
+      }
+      .s2-label {
+        position: absolute;
+        bottom: 10px;
+        left: 50%;
+        transform: translateX(-50%);
+        background: rgba(255, 255, 255, 0.8);
+        padding: 5px 15px;
+        border-radius: 20px;
+        font-family: "Montserrat", sans-serif;
+        font-weight: 600;
+        font-size: 0.8rem;
+        color: #d66d75;
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+      }
+      .s2-message {
+        margin-top: 30px;
+        font-style: italic;
+        color: #8854d0;
+        opacity: 0;
+        transform: translateY(20px);
+        transition: 0.5s;
+      }
+
+      /* CHAP 2B: REAL ZEN */
+      #chap-zen-real {
         background: radial-gradient(circle at center, #6d214f, #2d1b26);
         color: #fff;
       }
@@ -367,7 +562,7 @@
           linear-gradient(to bottom, #4a2c40, #2d1b26);
       }
       .scroll-paper {
-        background: rgba(255, 255, 255, 0.05); /* Glass */
+        background: rgba(255, 255, 255, 0.05);
         backdrop-filter: blur(25px) saturate(150%);
         width: 90%;
         max-height: 70vh;
@@ -377,7 +572,6 @@
         border: 1px solid rgba(255, 255, 255, 0.2);
         border-top: 1px solid rgba(255, 255, 255, 0.5);
         box-shadow: 0 20px 80px rgba(0, 0, 0, 0.6);
-
         font-family: "Pinyon Script", cursive;
         font-size: 1.8rem;
         color: #ffc2d1;
@@ -391,7 +585,7 @@
         background: var(--gold);
       }
 
-      /* CHAP 5: PRAYER (FIXED RESPONSIVENESS) */
+      /* CHAP 5: PRAYER */
       #chap-prayer {
         background: radial-gradient(circle, #b33771 0%, #2c1b2e 100%);
       }
@@ -408,7 +602,7 @@
       .prayer-frame {
         width: 100%;
         height: 100%;
-        border-radius: 50% 50% 10% 10% / 40% 40% 5% 5%; /* Hình vòm responsive */
+        border-radius: 50% 50% 10% 10% / 40% 40% 5% 5%;
         overflow: hidden;
         border: 3px solid rgba(255, 255, 255, 0.3);
         position: relative;
@@ -424,14 +618,13 @@
         filter: sepia(0.3) contrast(1.1);
         transition: 0.5s;
       }
-
       .energy-ring {
         position: absolute;
         top: 50%;
         left: 50%;
         transform: translate(-50%, -50%);
         width: 110%;
-        height: 110%; /* Lớn hơn khung một chút */
+        height: 110%;
         border-radius: 50% 50% 10% 10% / 40% 40% 5% 5%;
         border: 2px solid var(--gold);
         opacity: 0;
@@ -439,7 +632,6 @@
         box-shadow: 0 0 30px var(--gold);
         z-index: 1;
       }
-
       .hold-hint {
         position: absolute;
         bottom: -50px;
@@ -477,7 +669,7 @@
         text-shadow: 0 0 10px var(--gold);
       }
 
-      /* --- CHAP 6: THE VOW (FIXED UI BUG) --- */
+      /* CHAP 6: CONTRACT */
       #chap-contract {
         background: linear-gradient(to top, #1a0b14, #2c1b2e);
         border-top: 3px solid var(--hot-pink);
@@ -489,7 +681,7 @@
         border: 2px solid var(--gold);
         outline: 4px double var(--gold);
         outline-offset: 5px;
-        padding: 30px 20px 50px 20px; /* Thêm padding dưới để chứa con dấu */
+        padding: 30px 20px 50px 20px;
         border-radius: 4px;
         position: relative;
         color: #4a2c2c;
@@ -498,23 +690,22 @@
         background-image: radial-gradient(#d4af37 0.5px, transparent 0.5px);
         background-size: 15px 15px;
       }
-      /* Họa tiết góc */
-      .vow-certificate::before,
+      .vow-certificate::before {
+        content: "✦";
+        position: absolute;
+        color: var(--gold);
+        top: 10px;
+        left: 10px;
+        font-size: 1.5rem;
+      }
       .vow-certificate::after {
         content: "✦";
         position: absolute;
         color: var(--gold);
-        font-size: 1.5rem;
-      }
-      .vow-certificate::before {
-        top: 10px;
-        left: 10px;
-      }
-      .vow-certificate::after {
         bottom: 10px;
         right: 10px;
+        font-size: 1.5rem;
       }
-
       .vow-header {
         font-family: "Cinzel", serif;
         font-size: 1.6rem;
@@ -546,7 +737,6 @@
         color: #d4af37;
         animation: pulse 3s infinite;
       }
-
       #signature-pad {
         width: 100%;
         height: 100px;
@@ -576,8 +766,6 @@
         box-shadow: 0 5px 15px rgba(212, 175, 55, 0.4);
         border-radius: 50px;
       }
-
-      /* FIX BUG: Con dấu nằm gọn góc phải dưới, không đè chữ */
       .wax-seal {
         position: absolute;
         bottom: 20px;
@@ -663,105 +851,51 @@
           transform: scale(0.95);
         }
       }
-      /* --- STYLE CHO SECTION 2 MỚI (DUAL VIBE) --- */
-        #chap-zen {
-            position: relative;
-            background: #fff0f5; /* Mặc định hồng nhạt */
-            transition: background 0.5s ease;
-        }
-        
-        .s2-bg-layer {
-            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
-            background: radial-gradient(circle, rgba(255,255,255,0.8) 0%, transparent 100%);
-            z-index: 0; opacity: 0.5;
-        }
-
-        .s2-card-container {
-            display: flex; justify-content: center; align-items: center;
-            gap: 20px; z-index: 10; width: 100%;
-            perspective: 1000px; /* Tạo chiều sâu 3D */
-        }
-
-        .s2-card {
-            width: 42vw; height: 60vw; max-width: 200px; max-height: 300px;
-            cursor: pointer; position: relative;
-            transform-style: preserve-3d;
-            transition: transform 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-        }
-
-        .s2-card.left { transform: rotateY(15deg) translateZ(0); }
-        .s2-card.right { transform: rotateY(-15deg) translateZ(0); }
-        
-        /* Hiệu ứng khi Active */
-        .s2-card.active { 
-            transform: rotateY(0) scale(1.1) translateZ(50px) !important; 
-            z-index: 20;
-        }
-        .s2-card.inactive {
-            transform: scale(0.9); opacity: 0.6; filter: blur(2px);
-        }
-
-        .s2-inner {
-            width: 100%; height: 100%;
-            border-radius: 15px; overflow: hidden;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
-            border: 4px solid #fff;
-            position: relative;
-        }
-
-        .s2-img {
-            width: 100%; height: 100%; object-fit: cover;
-            transition: transform 0.5s;
-        }
-
-        .s2-label {
-            position: absolute; bottom: 10px; left: 50%; transform: translateX(-50%);
-            background: rgba(255,255,255,0.8);
-            padding: 5px 15px; border-radius: 20px;
-            font-family: 'Montserrat', sans-serif; font-weight: 600;
-            font-size: 0.8rem; color: #d66d75;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-        }
-
-        .s2-message {
-            margin-top: 30px; font-style: italic; color: #8854d0;
-            opacity: 0; transform: translateY(20px); transition: 0.5s;
-        }
     </style>
   </head>
   <body>
     <!-- AUDIO PLAYER -->
     <div id="yt-player" data-video-id="3onAOL9dY1o"></div>
 
-    <!-- GLOBAL PARTICLES (FIXED & FULL SCREEN) -->
+    <!-- GLOBAL PARTICLES -->
     <div id="global-particles"></div>
 
-    <!-- 0. LOADER -->
+    <!-- 0. LOADER GAME: CATCH THE LOVE -->
     <div id="loader">
-      <div class="loader-ring"></div>
-      <div
-        class="serif"
-        style="
-          color: var(--primary-pink);
-          margin-top: 20px;
-          font-size: 1.8rem;
-          text-shadow: 0 0 20px var(--hot-pink);
-        "
-      >
-        Trần Kim Bảo Ngọc
+      <div class="game-container">
+        <!-- SVG Heart (Fillable) -->
+        <svg class="heart-svg" viewBox="0 0 32 29.6">
+          <defs>
+            <clipPath id="clip-heart">
+              <path
+                d="M23.6,0c-3.4,0-6.3,2.7-7.6,5.6C14.7,2.7,11.8,0,8.4,0C3.8,0,0,3.8,0,8.4c0,9.4,9.5,11.9,16,21.2
+              c6.1-9.3,16-11.8,16-21.2C32,3.8,28.2,0,23.6,0z"
+              />
+            </clipPath>
+          </defs>
+          <path
+            class="main-heart-path"
+            d="M23.6,0c-3.4,0-6.3,2.7-7.6,5.6C14.7,2.7,11.8,0,8.4,0C3.8,0,0,3.8,0,8.4c0,9.4,9.5,11.9,16,21.2
+          c6.1-9.3,16-11.8,16-21.2C32,3.8,28.2,0,23.6,0z"
+          />
+          <!-- The Filling Liquid -->
+          <rect
+            x="0"
+            y="0"
+            width="32"
+            height="30"
+            class="main-heart-fill"
+            id="heart-fill"
+          />
+        </svg>
       </div>
-      <div
-        class="cinzel"
-        style="
-          color: var(--gold);
-          font-size: 0.8rem;
-          margin-top: 10px;
-          letter-spacing: 5px;
-        "
-      >
-        THE ETERNAL MUSE
-      </div>
-      <button class="start-btn" onclick="enterUniverse()">KẾT NỐI</button>
+
+      <div class="loader-progress-text" id="progress-text">0%</div>
+      <div class="loader-hint">Chạm vào các mảnh ký ức để làm đầy trái tim</div>
+
+      <button class="start-btn" id="enter-btn" onclick="enterUniverse()">
+        KẾT NỐI VŨ TRỤ
+      </button>
     </div>
 
     <!-- MAIN APP -->
@@ -777,62 +911,69 @@
         </div>
         <div class="muse-frame p1">
           <img
-            src=assets/z7505800560704_28f8f1a9ad403aab96492601257acf32.jpg
+            src="assets/z7505800560704_28f8f1a9ad403aab96492601257acf32.jpg"
             class="muse-img"
           />
         </div>
         <div class="muse-frame p2">
           <img
-            src=assets/z7505800559378_879107eb21e0e155380a06b7829f59af.jpg
+            src="assets/z7505800559378_879107eb21e0e155380a06b7829f59af.jpg"
             class="muse-img"
           />
         </div>
         <div class="muse-frame p3">
           <img
-            src=assets/z7505800560882_47b88f285e91e5263a0466b5c4140585.jpg
+            src="assets/z7505800560882_47b88f285e91e5263a0466b5c4140585.jpg"
             class="muse-img"
           />
         </div>
       </div>
 
-      <!-- 2. KHU VƯỜN CẢM XÚC (NEW CONCEPT: DUAL VIBE) -->
-        <div class="section" id="chap-zen">
-            <!-- Background chuyển màu động -->
-            <div class="s2-bg-layer" id="s2-bg"></div>
-            
-            <div class="text-safe title-box" style="margin-bottom: 30px;">
-                <h1 class="serif" style="color: #e84393; font-size: 2.5rem;">Thế Giới Của Em</h1>
-                <p class="cinzel" style="color: #a45056; font-size: 0.7rem; margin-top: 5px;">CHẠM VÀO ĐỂ KHÁM PHÁ VẺ ĐẸP</p>
-            </div>
-
-            <div class="s2-card-container">
-                <!-- CARD 1: SWEET (HỒNG) -->
-                <div class="s2-card left" onclick="activeVibe('pink')">
-                    <div class="s2-inner">
-                        <img src="assets/75244cb0-1374-47a5-a49e-5219b54b0643.jpg" class="s2-img">
-                        <div class="s2-label">Ngọt Ngào</div>
-                    </div>
-                </div>
-
-                <!-- CARD 2: PURE (TRẮNG) -->
-                <div class="s2-card right" onclick="activeVibe('white')">
-                    <div class="s2-inner">
-                        <img src="assets/a4b129eb-fa83-4cd2-b3f5-e145e964938b.jpg" class="s2-img">
-                        <div class="s2-label">Tinh Khôi</div>
-                    </div>
-                </div>
-            </div>
-
-            <div class="s2-message text-safe" id="s2-msg">
-                "Dù là công chúa đời thường hay nàng thơ thoát tục,<br>em đều là kiệt tác."
-            </div>
-        </div>
-
-      <!-- 2. CÕI TỊNH -->
+      <!-- 2. KHU VƯỜN CẢM XÚC -->
       <div class="section" id="chap-zen">
+        <div class="s2-bg-layer" id="s2-bg"></div>
+        <div class="text-safe title-box" style="margin-bottom: 30px">
+          <h1 class="serif" style="color: #e84393; font-size: 2.5rem">
+            Thế Giới Của Em
+          </h1>
+          <p
+            class="cinzel"
+            style="color: #a45056; font-size: 0.7rem; margin-top: 5px"
+          >
+            CHẠM VÀO ĐỂ KHÁM PHÁ VẺ ĐẸP
+          </p>
+        </div>
+        <div class="s2-card-container">
+          <div class="s2-card left" onclick="activeVibe('pink')">
+            <div class="s2-inner">
+              <img
+                src="assets/75244cb0-1374-47a5-a49e-5219b54b0643.jpg"
+                class="s2-img"
+              />
+              <div class="s2-label">Ngọt Ngào</div>
+            </div>
+          </div>
+          <div class="s2-card right" onclick="activeVibe('white')">
+            <div class="s2-inner">
+              <img
+                src="assets/a4b129eb-fa83-4cd2-b3f5-e145e964938b.jpg"
+                class="s2-img"
+              />
+              <div class="s2-label">Tinh Khôi</div>
+            </div>
+          </div>
+        </div>
+        <div class="s2-message text-safe" id="s2-msg">
+          "Dù là công chúa đời thường hay nàng thơ thoát tục,<br />em đều là
+          kiệt tác."
+        </div>
+      </div>
+
+      <!-- 2B. CÕI TỊNH -->
+      <div class="section" id="chap-zen-real">
         <div class="zen-gateway">
           <img
-            src=assets/z7505800568275_c58c5ba702d7f29b6aa8afe8627e1fba.jpg
+            src="assets/z7505800568275_c58c5ba702d7f29b6aa8afe8627e1fba.jpg"
             class="zen-photo"
           />
           <div class="zen-overlay">
@@ -855,7 +996,7 @@
           </div>
         </div>
         <img
-          src=assets/z7505800561206_f3b5530a7faaa0897d7b0d421ad0a398.jpg
+          src="assets/z7505800561206_f3b5530a7faaa0897d7b0d421ad0a398.jpg"
           class="zen-bg-layer"
         />
       </div>
@@ -864,7 +1005,6 @@
       <div class="section" id="chap-destiny">
         <canvas id="canvas-thread"></canvas>
         <div class="heart-core"></div>
-
         <div class="thread-text text-safe">
           <h2 class="royal" style="font-size: 4rem; margin: 0; color: #ffb7c5">
             Giao Thoa
@@ -891,13 +1031,13 @@
         <div class="scroll-paper text-safe" id="letter-content"></div>
       </div>
 
-      <!-- 5. LỜI NGUYỆN CẦU (FIXED FRAME) -->
+      <!-- 5. LỜI NGUYỆN CẦU -->
       <div class="section" id="chap-prayer">
         <div class="hold-area" id="hold-target">
           <div class="energy-ring"></div>
           <div class="prayer-frame">
             <img
-              src=assets/z7505800560882_47b88f285e91e5263a0466b5c4140585.jpg
+              src="assets/z7505800560882_47b88f285e91e5263a0466b5c4140585.jpg"
               class="prayer-photo"
               id="prayer-img"
             />
@@ -923,7 +1063,7 @@
         </div>
       </div>
 
-      <!-- 6. HÔN ƯỚC NGÂN HÀ (FIXED SEAL POSITION) -->
+      <!-- 6. HÔN ƯỚC -->
       <div class="section" id="chap-contract">
         <div class="vow-certificate">
           <div class="vow-header">Hôn Ước Ngân Hà</div>
@@ -934,23 +1074,120 @@
             để yêu thương, bảo vệ và xây dựng một tương lai rực rỡ nhất<br />
             cho người vợ định mệnh của mình:
           </div>
-
           <div class="vow-names">Trần Kim Bảo Ngọc</div>
-
           <div class="sign-placeholder">CHỮ KÝ CỦA EM</div>
           <canvas id="signature-pad"></canvas>
-
           <button class="sign-btn" onclick="submitSign()">
             ĐỒNG Ý LẤY ANH
           </button>
-
-          <!-- Con dấu sáp đỏ: Đặt ở góc dưới cùng bên phải, không che chữ ký -->
           <div class="wax-seal" id="seal">ĐÃ KÝ</div>
         </div>
       </div>
     </div>
 
     <script>
+      // --- LOADER GAME LOGIC: COLLECT LOVE ---
+      let loveScore = 0;
+      const totalScore = 100;
+      const loaderEl = document.getElementById("loader");
+      const enterBtn = document.getElementById("enter-btn");
+      const heartFill = document.getElementById("heart-fill");
+      const progressText = document.getElementById("progress-text");
+
+      function spawnShard() {
+        if (loveScore >= totalScore) return;
+
+        const shard = document.createElement("div");
+        shard.className = "memory-shard";
+        // Random position
+        const x = Math.random() * (window.innerWidth - 60) + 30;
+        const y = Math.random() * (window.innerHeight - 60) + 30;
+
+        shard.style.left = x + "px";
+        shard.style.top = y + "px";
+
+        // Animation
+        gsap.to(shard, {
+          opacity: 1,
+          scale: 1,
+          duration: 0.5,
+        });
+
+        // Click interaction
+        shard.onclick = () => {
+          collectShard(shard);
+        };
+
+        loaderEl.appendChild(shard);
+      }
+
+      function collectShard(el) {
+        // Prevent double click
+        el.onclick = null;
+
+        // Visual feedback
+        loveScore += 10; // 10 clicks to finish
+        if (loveScore > totalScore) loveScore = totalScore;
+
+        // Animate shard flying to center
+        const rect = el.getBoundingClientRect();
+        const centerX = window.innerWidth / 2;
+        const centerY = window.innerHeight / 2;
+
+        gsap.to(el, {
+          x: centerX - rect.left - 20, // Relative move
+          y: centerY - rect.top - 20,
+          scale: 0,
+          opacity: 0,
+          duration: 0.8,
+          ease: "power2.in",
+          onComplete: () => {
+            el.remove();
+            updateHeart();
+          },
+        });
+      }
+
+      function updateHeart() {
+        const pct = loveScore / totalScore;
+        // Fill up heart (scaleY)
+        heartFill.style.transform = `scaleY(${pct})`;
+        progressText.innerText = loveScore + "%";
+
+        // Burst confetti when collecting
+        if (loveScore < totalScore) {
+          // Small burst
+        }
+
+        if (loveScore >= totalScore) {
+          gameWin();
+        } else {
+          // Spawn next batch if needed, or just let loop handle it
+        }
+      }
+
+      function gameWin() {
+        clearInterval(gameLoop);
+        document.querySelector(".loader-hint").innerText =
+          "TRÁI TIM ĐÃ ĐƯỢC SƯỞI ẤM";
+        enterBtn.classList.add("active");
+
+        // Big Confetti
+        confetti({
+          particleCount: 150,
+          spread: 70,
+          origin: { y: 0.6 },
+          colors: ["#e84393", "#ff9a9e"],
+        });
+      }
+
+      // Start spawning shards
+      const gameLoop = setInterval(() => {
+        if (document.querySelectorAll(".memory-shard").length < 5) {
+          spawnShard();
+        }
+      }, 800);
+
       // --- AUTO-PLAY MUSIC ---
       var player;
       function onYouTubeIframeAPIReady() {
@@ -975,6 +1212,41 @@
       var firstScriptTag = document.getElementsByTagName("script")[0];
       firstScriptTag.parentNode.insertBefore(tag, firstScriptTag);
 
+      // --- CINEMATIC AUTO-SCROLL LOGIC ---
+      let autoScrollActive = false;
+      let scrollSpeed = 0.6; // Tốc độ trôi (px/frame). 0.6 là vừa phải.
+
+      function startCinematicScroll() {
+        autoScrollActive = true;
+        autoScrollLoop();
+      }
+
+      function autoScrollLoop() {
+        if (!autoScrollActive) return;
+
+        // Tăng vị trí cuộn
+        window.scrollBy(0, scrollSpeed);
+
+        // Kiểm tra nếu cuộn đến đáy
+        if (window.innerHeight + window.scrollY >= document.body.offsetHeight) {
+          autoScrollActive = false;
+        } else {
+          requestAnimationFrame(autoScrollLoop);
+        }
+      }
+
+      // Dừng cuộn khi người dùng tương tác
+      function stopAutoScroll() {
+        if (autoScrollActive) {
+          autoScrollActive = false;
+        }
+      }
+
+      // Gán sự kiện dừng cuộn cho toàn bộ trang
+      window.addEventListener("touchstart", stopAutoScroll);
+      window.addEventListener("wheel", stopAutoScroll);
+      window.addEventListener("mousedown", stopAutoScroll);
+
       function enterUniverse() {
         if (player && player.playVideo) {
           player.playVideo();
@@ -989,6 +1261,8 @@
             initAnims();
             initThread();
             initHold();
+            // BẮT ĐẦU CUỘN TỰ ĐỘNG
+            startCinematicScroll();
           },
         });
       }
@@ -1049,7 +1323,7 @@
           opacity: 1,
           y: -20,
           duration: 2,
-          scrollTrigger: { trigger: "#chap-zen", start: "top center" },
+          scrollTrigger: { trigger: "#chap-zen-real", start: "top center" },
         });
         ScrollTrigger.create({
           trigger: "#chap-letter",
@@ -1065,7 +1339,6 @@
         const ctx = c.getContext("2d");
         c.width = window.innerWidth;
         c.height = window.innerHeight;
-        // ... (Code cánh hoa giữ nguyên hoặc thêm nếu cần)
       }
 
       // --- THREAD ---
@@ -1135,6 +1408,9 @@
 
         function start(e) {
           e.preventDefault();
+          // Dừng auto scroll khi tương tác
+          stopAutoScroll();
+
           frame.style.transform = "scale(0.95)";
           ring.style.opacity = 1;
           timer = setInterval(() => {
@@ -1199,6 +1475,8 @@
         return { x: clientX - rect.left, y: clientY - rect.top };
       }
       function dStart(e) {
+        // Dừng auto scroll khi ký tên
+        stopAutoScroll();
         draw = true;
         const p = getPos(e);
         cx.beginPath();
@@ -1222,6 +1500,7 @@
       cvs.addEventListener("touchend", dEnd);
 
       function submitSign() {
+        stopAutoScroll(); // Đảm bảo dừng khi submit
         const seal = document.getElementById("seal");
         gsap.to(seal, {
           opacity: 1,
@@ -1240,66 +1519,68 @@
       }
 
       // --- LOGIC CHO SECTION 2 (DUAL VIBE) ---
-        function activeVibe(type) {
-            const leftCard = document.querySelector('.s2-card.left');
-            const rightCard = document.querySelector('.s2-card.right');
-            const section = document.getElementById('chap-zen');
-            const msg = document.getElementById('s2-msg');
+      function activeVibe(type) {
+        // Dừng auto scroll khi tương tác
+        stopAutoScroll();
 
-            // Reset state
-            msg.style.opacity = 0;
-            
-            if(type === 'pink') {
-                // Hiệu ứng PINK
-                leftCard.classList.add('active'); leftCard.classList.remove('inactive');
-                rightCard.classList.add('inactive'); rightCard.classList.remove('active');
-                
-                // Đổi nền sang hồng đậm hơn chút
-                section.style.background = "linear-gradient(135deg, #ffc3a0 0%, #ffafbd 100%)";
-                
-                // Bắn Confetti Hồng & Kẹo ngọt
-                confetti({
-                    particleCount: 100, spread: 70, origin: { x: 0.3, y: 0.5 },
-                    colors: ['#ff9a9e', '#fecfef', '#ffffff'],
-                    shapes: ['circle']
-                });
+        const leftCard = document.querySelector(".s2-card.left");
+        const rightCard = document.querySelector(".s2-card.right");
+        const section = document.getElementById("chap-zen");
+        const msg = document.getElementById("s2-msg");
 
-                // Đổi lời nhắn
-                setTimeout(() => {
-                    msg.innerHTML = "Em là viên kẹo ngọt ngào nhất thế gian ❤";
-                    msg.style.color = "#c0392b";
-                    msg.style.opacity = 1; msg.style.transform = "translateY(0)";
-                }, 300);
+        msg.style.opacity = 0;
 
-            } else {
-                // Hiệu ứng WHITE
-                rightCard.classList.add('active'); rightCard.classList.remove('inactive');
-                leftCard.classList.add('inactive'); leftCard.classList.remove('active');
-                
-                // Đổi nền sang Trắng xanh tinh khôi
-                section.style.background = "linear-gradient(135deg, #e0c3fc 0%, #8ec5fc 100%)";
-                
-                // Bắn Confetti Sao & Lấp lánh
-                confetti({
-                    particleCount: 100, spread: 70, origin: { x: 0.7, y: 0.5 },
-                    colors: ['#a18cd1', '#fbc2eb', '#ffffff'],
-                    shapes: ['star']
-                });
-
-                // Đổi lời nhắn
-                setTimeout(() => {
-                    msg.innerHTML = "Và là thiên thần trong trẻo nhất của anh ✨";
-                    msg.style.color = "#2c3e50";
-                    msg.style.opacity = 1; msg.style.transform = "translateY(0)";
-                }, 300);
-            }
+        if (type === "pink") {
+          leftCard.classList.add("active");
+          leftCard.classList.remove("inactive");
+          rightCard.classList.add("inactive");
+          rightCard.classList.remove("active");
+          section.style.background =
+            "linear-gradient(135deg, #ffc3a0 0%, #ffafbd 100%)";
+          confetti({
+            particleCount: 100,
+            spread: 70,
+            origin: { x: 0.3, y: 0.5 },
+            colors: ["#ff9a9e", "#fecfef", "#ffffff"],
+            shapes: ["circle"],
+          });
+          setTimeout(() => {
+            msg.innerHTML = "Em là viên kẹo ngọt ngào nhất thế gian ❤";
+            msg.style.color = "#c0392b";
+            msg.style.opacity = 1;
+            msg.style.transform = "translateY(0)";
+          }, 300);
+        } else {
+          rightCard.classList.add("active");
+          rightCard.classList.remove("inactive");
+          leftCard.classList.add("inactive");
+          leftCard.classList.remove("active");
+          section.style.background =
+            "linear-gradient(135deg, #e0c3fc 0%, #8ec5fc 100%)";
+          confetti({
+            particleCount: 100,
+            spread: 70,
+            origin: { x: 0.7, y: 0.5 },
+            colors: ["#a18cd1", "#fbc2eb", "#ffffff"],
+            shapes: ["star"],
+          });
+          setTimeout(() => {
+            msg.innerHTML = "Và là thiên thần trong trẻo nhất của anh ✨";
+            msg.style.color = "#2c3e50";
+            msg.style.opacity = 1;
+            msg.style.transform = "translateY(0)";
+          }, 300);
         }
-        
-        // Animation xuất hiện ban đầu
-        gsap.to(".s2-card", {
-            y: 0, opacity: 1, duration: 1, stagger: 0.2, ease: "back.out(1.7)",
-            scrollTrigger: { trigger: "#chap-zen", start: "top center" }
-        });
+      }
+
+      gsap.to(".s2-card", {
+        y: 0,
+        opacity: 1,
+        duration: 1,
+        stagger: 0.2,
+        ease: "back.out(1.7)",
+        scrollTrigger: { trigger: "#chap-zen", start: "top center" },
+      });
     </script>
   </body>
 </html>
